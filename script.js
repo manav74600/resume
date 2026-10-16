@@ -1,21 +1,7 @@
-const glow=document.querySelector(".cursor-glow");
-window.addEventListener("mousemove",e=>{glow.style.left=e.clientX+"px";glow.style.top=e.clientY+"px"});
-
-const menu=document.querySelector(".menu-btn");
-const nav=document.querySelector(".nav-links");
-menu.addEventListener("click",()=>nav.classList.toggle("open"));
-document.querySelectorAll(".nav-links a").forEach(a=>a.addEventListener("click",()=>nav.classList.remove("open")));
-
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(entry=>{if(entry.isIntersecting) entry.target.classList.add("visible")});
-},{threshold:.12});
-document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
-
-document.querySelectorAll(".skill").forEach(card=>{
-  card.addEventListener("mousemove",e=>{
-    const r=card.getBoundingClientRect();
-    const x=e.clientX-r.left, y=e.clientY-r.top;
-    card.style.transform=`perspective(700px) rotateX(${(y-r.height/2)/-35}deg) rotateY(${(x-r.width/2)/35}deg)`;
-  });
-  card.addEventListener("mouseleave",()=>card.style.transform="");
-});
+const glow=document.querySelector('.glow');window.addEventListener('pointermove',e=>{if(glow&&e.pointerType!=='touch'){glow.style.left=e.clientX+'px';glow.style.top=e.clientY+'px';}});
+const menu=document.querySelector('.menu'),nav=document.querySelector('nav');menu.addEventListener('click',()=>{const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open));menu.textContent=open?'×':'☰';});
+document.querySelectorAll('nav a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('open');menu.setAttribute('aria-expanded','false');menu.textContent='☰';}));
+const revealObserver=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');revealObserver.unobserve(e.target);}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>revealObserver.observe(el));
+const navObserver=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)document.querySelectorAll('nav a[href^="#"]').forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id));}),{rootMargin:'-30% 0px -60% 0px'});
+document.querySelectorAll('main section[id]').forEach(s=>navObserver.observe(s));
